@@ -1,7 +1,7 @@
 # README.md
 # 🛡️ RAKSHAK — AI-Powered Predictive Rail Maintenance System
 
-> **FAR AWAY 2026** | Predicting failures before derailments happen.
+> Predicting failures before derailments happen.
 
 ---
 
@@ -165,10 +165,6 @@ Open your browser and navigate to:
 | Alerts | http://127.0.0.1:8000/alerts/ |
 | Tickets | http://127.0.0.1:8000/tickets/ |
 | Map | http://127.0.0.1:8000/map/ |
-
-## Team
-
-**FAR AWAY 2026**
 
 ## License
 
