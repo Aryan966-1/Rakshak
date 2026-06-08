@@ -19,20 +19,20 @@
                 <div class="summary-label">Total Tickets</div>
             </div>
             <div class="summary-card summary-card--critical">
-                <div class="summary-value">{{ summary.open }}</div>
-                <div class="summary-label">Open</div>
+                <div class="summary-value">{{ summary.assigned }}</div>
+                <div class="summary-label">Assigned</div>
             </div>
             <div class="summary-card summary-card--warning">
-                <div class="summary-value">{{ summary.in_progress }}</div>
-                <div class="summary-label">In Progress</div>
+                <div class="summary-value">{{ summary.scheduled }}</div>
+                <div class="summary-label">Scheduled</div>
             </div>
             <div class="summary-card summary-card--info">
                 <div class="summary-value">{{ summary.resolved }}</div>
                 <div class="summary-label">Resolved</div>
             </div>
             <div class="summary-card summary-card--active">
-                <div class="summary-value">{{ summary.high_priority }}</div>
-                <div class="summary-label">High Priority</div>
+                <div class="summary-value">{{ summary.critical_priority }}</div>
+                <div class="summary-label">Critical Priority</div>
             </div>
         </div>
     </section>
@@ -46,12 +46,12 @@
             <a href="?status=all"
                class="filter-btn {% if current_filter == 'all' %}filter-btn--active{% endif %}"
                id="filter-status-all">All</a>
-            <a href="?status=open"
-               class="filter-btn filter-btn--critical {% if current_filter == 'open' %}filter-btn--active{% endif %}"
-               id="filter-status-open">Open</a>
-            <a href="?status=in_progress"
-               class="filter-btn filter-btn--warning {% if current_filter == 'in_progress' %}filter-btn--active{% endif %}"
-               id="filter-status-progress">In Progress</a>
+            <a href="?status=assigned"
+               class="filter-btn filter-btn--critical {% if current_filter == 'assigned' %}filter-btn--active{% endif %}"
+               id="filter-status-assigned">Assigned</a>
+            <a href="?status=scheduled"
+               class="filter-btn filter-btn--warning {% if current_filter == 'scheduled' %}filter-btn--active{% endif %}"
+               id="filter-status-scheduled">Scheduled</a>
             <a href="?status=resolved"
                class="filter-btn filter-btn--info {% if current_filter == 'resolved' %}filter-btn--active{% endif %}"
                id="filter-status-resolved">Resolved</a>
@@ -72,9 +72,10 @@
                     <thead>
                         <tr>
                             <th>Ticket ID</th>
+                            <th>Linked Alert</th>
                             <th>Track Section</th>
                             <th>Issue</th>
-                            <th>Assigned To</th>
+                            <th>Team</th>
                             <th>Priority</th>
                             <th>Status</th>
                             <th>ETA</th>
@@ -84,6 +85,7 @@
                         {% for ticket in tickets %}
                         <tr id="ticket-{{ ticket.id }}">
                             <td class="td-mono">{{ ticket.id }}</td>
+                            <td class="td-mono" style="color: var(--accent-cyan);">{{ ticket.linked_alert }}</td>
                             <td>
                                 <div class="cell-track">
                                     <span class="track-section">{{ ticket.section }}</span>
@@ -91,28 +93,22 @@
                                 </div>
                             </td>
                             <td>{{ ticket.issue }}</td>
-                            <td>
-                                <div class="cell-engineer">
-                                    <span class="engineer-name">{{ ticket.assigned_to }}</span>
-                                    <span class="engineer-title">{{ ticket.designation }}</span>
-                                </div>
-                            </td>
+                            <td>{{ ticket.team }}</td>
                             <td>
                                 <span class="priority-badge priority-badge--{{ ticket.priority }}">
-                                    {{ ticket.priority|upper }}
+                                    {{ ticket.priority|title }}
                                 </span>
                             </td>
                             <td>
                                 <span class="status-badge status-badge--{{ ticket.status }}">
-                                    {% if ticket.status == 'in_progress' %}IN PROGRESS
-                                    {% else %}{{ ticket.status|upper }}{% endif %}
+                                    {{ ticket.status|title }}
                                 </span>
                             </td>
                             <td class="td-mono">{{ ticket.eta }}</td>
                         </tr>
                         {% empty %}
                         <tr>
-                            <td colspan="7" class="empty-cell">No tickets matching the current filter.</td>
+                            <td colspan="8" class="empty-cell">No tickets matching the current filter.</td>
                         </tr>
                         {% endfor %}
                     </tbody>
@@ -130,20 +126,19 @@
             <div class="ticket-card-header">
                 <span class="td-mono">{{ ticket.id }}</span>
                 <span class="priority-badge priority-badge--{{ ticket.priority }}">
-                    {{ ticket.priority|upper }}
+                    {{ ticket.priority|title }}
                 </span>
             </div>
             <h3 class="ticket-card-title">{{ ticket.issue }}</h3>
-            <p class="ticket-card-desc">{{ ticket.description }}</p>
             <div class="ticket-card-details">
+                <div class="ticket-card-detail">
+                    <span>🔗 Alert: <span style="color: var(--accent-cyan);" class="td-mono">{{ ticket.linked_alert }}</span></span>
+                </div>
                 <div class="ticket-card-detail">
                     <span>🛤️ {{ ticket.section }}</span>
                 </div>
                 <div class="ticket-card-detail">
-                    <span>👷 {{ ticket.assigned_to }} — {{ ticket.designation }}</span>
-                </div>
-                <div class="ticket-card-detail">
-                    <span>👥 {{ ticket.gang }}</span>
+                    <span>👥 {{ ticket.team }}</span>
                 </div>
                 <div class="ticket-card-detail">
                     <span>⏱️ ETA: {{ ticket.eta }}</span>
@@ -151,10 +146,8 @@
             </div>
             <div class="ticket-card-footer">
                 <span class="status-badge status-badge--{{ ticket.status }}">
-                    {% if ticket.status == 'in_progress' %}IN PROGRESS
-                    {% else %}{{ ticket.status|upper }}{% endif %}
+                    {{ ticket.status|title }}
                 </span>
-                <span class="ticket-created">{{ ticket.created }}</span>
             </div>
         </div>
         {% endfor %}

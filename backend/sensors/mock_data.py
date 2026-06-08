@@ -23,15 +23,14 @@ KPI_SUMMARY = {
 # ---------------------------------------------------------------------------
 SENSOR_TRENDS = {
     'timestamps': [
-        '00:00', '02:00', '04:00', '06:00', '08:00', '10:00',
-        '12:00', '14:00', '16:00', '18:00', '20:00', '22:00',
+        '00:00', '04:00', '08:00', '12:00', '16:00', '20:00', '24:00'
     ],
-    # Vibration amplitude (mm/s) — normal < 3.5, warning 3.5-5.0, critical > 5.0
-    'vibration': [2.1, 2.0, 2.3, 3.1, 3.8, 4.2, 4.5, 4.8, 3.9, 3.1, 2.8, 2.4],
-    # Rail temperature (°C) — normal < 40, warning 40-50, critical > 50
-    'temperature': [28, 27, 26, 29, 35, 41, 45, 48, 42, 37, 33, 30],
-    # Rail gauge deviation (mm from standard 1676mm) — normal ±2, warning ±4, critical ±6
-    'gauge_deviation': [0.2, 0.1, 0.3, 0.5, 1.2, 1.8, 2.1, 2.4, 1.9, 1.1, 0.6, 0.3],
+    # Vibration amplitude (mm/s)
+    'vibration': [2.1, 2.4, 2.8, 3.2, 3.7, 4.5, 5.8],
+    # Rail temperature (°C)
+    'temperature': [34, 35, 37, 39, 42, 45, 48],
+    # Rail gauge deviation (mm from standard 1676mm)
+    'gauge_deviation': [0.8, 1.2, 1.8, 2.1, 2.7, 3.0, 3.2],
 }
 
 # ---------------------------------------------------------------------------

@@ -16,7 +16,13 @@
  * @param {Array} stations - Array of station objects with lat/lng, name, status, etc.
  * @param {Array} routes - Array of route objects with coordinates, name, status.
  */
+
 function initRailwayMap(stations, routes) {
+    console.log("Stations:", stations);
+    console.log("Routes:", routes);
+    console.log("Station count:", stations.length);
+    console.log("Route count:", routes.length);
+
     const mapContainer = document.getElementById('railway-map');
     if (!mapContainer) return;
 

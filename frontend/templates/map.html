@@ -83,8 +83,9 @@
 </div>
 
 <!-- Inject map data as JSON for Leaflet -->
-{{ stations_json|json_script:"stations-data" }}
-{{ routes_json|json_script:"routes-data" }}
+{{ stations|json_script:"stations-data" }}
+{{ routes|json_script:"routes-data" }}
+
 {% endblock %}
 
 {% block extra_scripts %}

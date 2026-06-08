@@ -696,6 +696,25 @@ a:hover { color: var(--accent-cyan); }
     border: 1px solid rgba(239, 68, 68, 0.2);
 }
 
+.priority-badge--critical {
+    color: var(--accent-red);
+    background: var(--accent-red-dim);
+    border: 1px solid rgba(239, 68, 68, 0.5);
+    box-shadow: var(--shadow-glow-red);
+}
+
+.status-badge--assigned {
+    color: var(--accent-cyan);
+    background: rgba(6, 182, 212, 0.15);
+    border: 1px solid rgba(6, 182, 212, 0.2);
+}
+
+.status-badge--scheduled {
+    color: var(--accent-blue);
+    background: var(--accent-blue-dim);
+    border: 1px solid rgba(59, 130, 246, 0.2);
+}
+
 .priority-badge--medium {
     color: var(--accent-yellow);
     background: var(--accent-yellow-dim);
