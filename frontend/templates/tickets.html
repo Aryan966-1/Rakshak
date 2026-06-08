@@ -1,0 +1,163 @@
+<!-- frontend/templates/tickets.html -->
+<!--
+  Tickets page — maintenance ticket management view.
+  Shows ticket table with status badges, priority, assigned engineer, and ETA.
+-->
+{% extends "base.html" %}
+{% load static %}
+
+{% block content %}
+<div class="tickets-page">
+
+    <!-- ================================================================ -->
+    <!-- TICKET SUMMARY BAR                                               -->
+    <!-- ================================================================ -->
+    <section class="ticket-summary" id="ticket-summary">
+        <div class="summary-cards">
+            <div class="summary-card summary-card--total">
+                <div class="summary-value">{{ summary.total }}</div>
+                <div class="summary-label">Total Tickets</div>
+            </div>
+            <div class="summary-card summary-card--critical">
+                <div class="summary-value">{{ summary.open }}</div>
+                <div class="summary-label">Open</div>
+            </div>
+            <div class="summary-card summary-card--warning">
+                <div class="summary-value">{{ summary.in_progress }}</div>
+                <div class="summary-label">In Progress</div>
+            </div>
+            <div class="summary-card summary-card--info">
+                <div class="summary-value">{{ summary.resolved }}</div>
+                <div class="summary-label">Resolved</div>
+            </div>
+            <div class="summary-card summary-card--active">
+                <div class="summary-value">{{ summary.high_priority }}</div>
+                <div class="summary-label">High Priority</div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ================================================================ -->
+    <!-- FILTER CONTROLS                                                  -->
+    <!-- ================================================================ -->
+    <section class="filter-bar" id="ticket-filters">
+        <div class="filter-group">
+            <span class="filter-label">Filter by Status:</span>
+            <a href="?status=all"
+               class="filter-btn {% if current_filter == 'all' %}filter-btn--active{% endif %}"
+               id="filter-status-all">All</a>
+            <a href="?status=open"
+               class="filter-btn filter-btn--critical {% if current_filter == 'open' %}filter-btn--active{% endif %}"
+               id="filter-status-open">Open</a>
+            <a href="?status=in_progress"
+               class="filter-btn filter-btn--warning {% if current_filter == 'in_progress' %}filter-btn--active{% endif %}"
+               id="filter-status-progress">In Progress</a>
+            <a href="?status=resolved"
+               class="filter-btn filter-btn--info {% if current_filter == 'resolved' %}filter-btn--active{% endif %}"
+               id="filter-status-resolved">Resolved</a>
+        </div>
+    </section>
+
+    <!-- ================================================================ -->
+    <!-- TICKET TABLE                                                     -->
+    <!-- ================================================================ -->
+    <section class="ticket-table-section" id="ticket-list">
+        <div class="data-card">
+            <h2 class="section-title">
+                <span class="section-icon">🎫</span>
+                Maintenance Tickets
+            </h2>
+            <div class="table-wrapper">
+                <table class="data-table" id="tickets-table">
+                    <thead>
+                        <tr>
+                            <th>Ticket ID</th>
+                            <th>Track Section</th>
+                            <th>Issue</th>
+                            <th>Assigned To</th>
+                            <th>Priority</th>
+                            <th>Status</th>
+                            <th>ETA</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for ticket in tickets %}
+                        <tr id="ticket-{{ ticket.id }}">
+                            <td class="td-mono">{{ ticket.id }}</td>
+                            <td>
+                                <div class="cell-track">
+                                    <span class="track-section">{{ ticket.section }}</span>
+                                    <span class="track-id">{{ ticket.track_id }}</span>
+                                </div>
+                            </td>
+                            <td>{{ ticket.issue }}</td>
+                            <td>
+                                <div class="cell-engineer">
+                                    <span class="engineer-name">{{ ticket.assigned_to }}</span>
+                                    <span class="engineer-title">{{ ticket.designation }}</span>
+                                </div>
+                            </td>
+                            <td>
+                                <span class="priority-badge priority-badge--{{ ticket.priority }}">
+                                    {{ ticket.priority|upper }}
+                                </span>
+                            </td>
+                            <td>
+                                <span class="status-badge status-badge--{{ ticket.status }}">
+                                    {% if ticket.status == 'in_progress' %}IN PROGRESS
+                                    {% else %}{{ ticket.status|upper }}{% endif %}
+                                </span>
+                            </td>
+                            <td class="td-mono">{{ ticket.eta }}</td>
+                        </tr>
+                        {% empty %}
+                        <tr>
+                            <td colspan="7" class="empty-cell">No tickets matching the current filter.</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </section>
+
+    <!-- ================================================================ -->
+    <!-- TICKET DETAIL CARDS (mobile-friendly alternative view)           -->
+    <!-- ================================================================ -->
+    <section class="ticket-cards-section" id="ticket-cards">
+        {% for ticket in tickets %}
+        <div class="ticket-card ticket-card--{{ ticket.priority }}" id="tcard-{{ ticket.id }}">
+            <div class="ticket-card-header">
+                <span class="td-mono">{{ ticket.id }}</span>
+                <span class="priority-badge priority-badge--{{ ticket.priority }}">
+                    {{ ticket.priority|upper }}
+                </span>
+            </div>
+            <h3 class="ticket-card-title">{{ ticket.issue }}</h3>
+            <p class="ticket-card-desc">{{ ticket.description }}</p>
+            <div class="ticket-card-details">
+                <div class="ticket-card-detail">
+                    <span>🛤️ {{ ticket.section }}</span>
+                </div>
+                <div class="ticket-card-detail">
+                    <span>👷 {{ ticket.assigned_to }} — {{ ticket.designation }}</span>
+                </div>
+                <div class="ticket-card-detail">
+                    <span>👥 {{ ticket.gang }}</span>
+                </div>
+                <div class="ticket-card-detail">
+                    <span>⏱️ ETA: {{ ticket.eta }}</span>
+                </div>
+            </div>
+            <div class="ticket-card-footer">
+                <span class="status-badge status-badge--{{ ticket.status }}">
+                    {% if ticket.status == 'in_progress' %}IN PROGRESS
+                    {% else %}{{ ticket.status|upper }}{% endif %}
+                </span>
+                <span class="ticket-created">{{ ticket.created }}</span>
+            </div>
+        </div>
+        {% endfor %}
+    </section>
+</div>
+{% endblock %}

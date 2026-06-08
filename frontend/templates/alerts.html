@@ -1,0 +1,118 @@
+<!-- frontend/templates/alerts.html -->
+<!--
+  Alerts page — displays all infrastructure alerts with severity filtering.
+  Each alert shows severity badge, description, location, and timestamp.
+-->
+{% extends "base.html" %}
+{% load static %}
+
+{% block content %}
+<div class="alerts-page">
+
+    <!-- ================================================================ -->
+    <!-- ALERT SUMMARY BAR                                                -->
+    <!-- ================================================================ -->
+    <section class="alert-summary" id="alert-summary">
+        <div class="summary-cards">
+            <div class="summary-card summary-card--total">
+                <div class="summary-value">{{ summary.total }}</div>
+                <div class="summary-label">Total Alerts</div>
+            </div>
+            <div class="summary-card summary-card--critical">
+                <div class="summary-value">{{ summary.critical }}</div>
+                <div class="summary-label">Critical</div>
+            </div>
+            <div class="summary-card summary-card--warning">
+                <div class="summary-value">{{ summary.warning }}</div>
+                <div class="summary-label">Warning</div>
+            </div>
+            <div class="summary-card summary-card--info">
+                <div class="summary-value">{{ summary.info }}</div>
+                <div class="summary-label">Info</div>
+            </div>
+            <div class="summary-card summary-card--active">
+                <div class="summary-value">{{ summary.active }}</div>
+                <div class="summary-label">Active</div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ================================================================ -->
+    <!-- FILTER CONTROLS                                                  -->
+    <!-- ================================================================ -->
+    <section class="filter-bar" id="alert-filters">
+        <div class="filter-group">
+            <span class="filter-label">Filter by Severity:</span>
+            <a href="?severity=all"
+               class="filter-btn {% if current_filter == 'all' %}filter-btn--active{% endif %}"
+               id="filter-all">All</a>
+            <a href="?severity=critical"
+               class="filter-btn filter-btn--critical {% if current_filter == 'critical' %}filter-btn--active{% endif %}"
+               id="filter-critical">🔴 Critical</a>
+            <a href="?severity=warning"
+               class="filter-btn filter-btn--warning {% if current_filter == 'warning' %}filter-btn--active{% endif %}"
+               id="filter-warning">🟡 Warning</a>
+            <a href="?severity=info"
+               class="filter-btn filter-btn--info {% if current_filter == 'info' %}filter-btn--active{% endif %}"
+               id="filter-info">🔵 Info</a>
+        </div>
+    </section>
+
+    <!-- ================================================================ -->
+    <!-- ALERT LIST                                                       -->
+    <!-- ================================================================ -->
+    <section class="alert-list" id="alert-list">
+        {% for alert in alerts %}
+        <div class="alert-card alert-card--{{ alert.severity }}" id="alert-{{ alert.id }}">
+            <div class="alert-severity-strip"></div>
+            <div class="alert-body">
+                <div class="alert-header">
+                    <div class="alert-title-row">
+                        <span class="severity-badge severity-badge--{{ alert.severity }}">
+                            {% if alert.severity == 'critical' %}🔴 CRITICAL
+                            {% elif alert.severity == 'warning' %}🟡 WARNING
+                            {% else %}🔵 INFO{% endif %}
+                        </span>
+                        <h3 class="alert-title">{{ alert.title }}</h3>
+                    </div>
+                    <div class="alert-meta">
+                        <span class="alert-id">{{ alert.id }}</span>
+                        <span class="alert-status alert-status--{{ alert.status }}">
+                            {{ alert.status|upper }}
+                        </span>
+                    </div>
+                </div>
+                <p class="alert-description">{{ alert.description }}</p>
+                <div class="alert-details">
+                    <div class="alert-detail">
+                        <span class="detail-icon">🛤️</span>
+                        <span class="detail-label">Track:</span>
+                        <span class="detail-value">{{ alert.track_id }}</span>
+                    </div>
+                    <div class="alert-detail">
+                        <span class="detail-icon">📍</span>
+                        <span class="detail-label">Station:</span>
+                        <span class="detail-value">{{ alert.station }}</span>
+                    </div>
+                    <div class="alert-detail">
+                        <span class="detail-icon">🏢</span>
+                        <span class="detail-label">Zone:</span>
+                        <span class="detail-value">{{ alert.zone }}</span>
+                    </div>
+                    <div class="alert-detail">
+                        <span class="detail-icon">🕐</span>
+                        <span class="detail-label">Time:</span>
+                        <span class="detail-value">{{ alert.timestamp }}</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% empty %}
+        <div class="empty-state">
+            <div class="empty-icon">✅</div>
+            <p>No alerts matching the current filter.</p>
+        </div>
+        {% endfor %}
+    </section>
+</div>
+{% endblock %}

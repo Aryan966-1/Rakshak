@@ -1,0 +1,226 @@
+<!-- frontend/templates/dashboard.html -->
+<!--
+  Dashboard page — Rakshak Operations Control Center.
+  Shows KPI cards, sensor trend charts, track health table, and recent readings.
+-->
+{% extends "base.html" %}
+{% load static %}
+
+{% block content %}
+<div class="dashboard">
+
+    <!-- ================================================================ -->
+    <!-- KPI SUMMARY CARDS                                                -->
+    <!-- ================================================================ -->
+    <section class="kpi-section" id="kpi-section">
+        <div class="kpi-grid">
+            <!-- Overall Health -->
+            <div class="kpi-card kpi-card--health" id="kpi-health">
+                <div class="kpi-icon">💚</div>
+                <div class="kpi-content">
+                    <div class="kpi-value" data-target="{{ kpi.overall_health }}">0</div>
+                    <div class="kpi-unit">%</div>
+                </div>
+                <div class="kpi-label">Overall Health</div>
+                <div class="kpi-bar">
+                    <div class="kpi-bar-fill kpi-bar-fill--health" style="width: {{ kpi.overall_health }}%"></div>
+                </div>
+            </div>
+
+            <!-- Active Alerts -->
+            <div class="kpi-card kpi-card--alerts" id="kpi-alerts">
+                <div class="kpi-icon">🚨</div>
+                <div class="kpi-content">
+                    <div class="kpi-value" data-target="{{ kpi.active_alerts }}">0</div>
+                </div>
+                <div class="kpi-label">Active Alerts</div>
+                <div class="kpi-trend kpi-trend--up">↑ 3 since yesterday</div>
+            </div>
+
+            <!-- Predicted Failures -->
+            <div class="kpi-card kpi-card--failures" id="kpi-failures">
+                <div class="kpi-icon">⚠️</div>
+                <div class="kpi-content">
+                    <div class="kpi-value" data-target="{{ kpi.predicted_failures }}">0</div>
+                </div>
+                <div class="kpi-label">Predicted Failures</div>
+                <div class="kpi-trend kpi-trend--neutral">Next 72 hours</div>
+            </div>
+
+            <!-- Cost Savings -->
+            <div class="kpi-card kpi-card--savings" id="kpi-savings">
+                <div class="kpi-icon">💰</div>
+                <div class="kpi-content">
+                    <div class="kpi-prefix">₹</div>
+                    <div class="kpi-value" data-target="{{ kpi.cost_savings }}">0</div>
+                </div>
+                <div class="kpi-label">Cost Savings</div>
+                <div class="kpi-trend kpi-trend--down">Preventive vs Reactive</div>
+            </div>
+
+            <!-- Tracks Monitored -->
+            <div class="kpi-card kpi-card--tracks" id="kpi-tracks">
+                <div class="kpi-icon">🛤️</div>
+                <div class="kpi-content">
+                    <div class="kpi-value" data-target="{{ kpi.tracks_monitored }}">0</div>
+                </div>
+                <div class="kpi-label">Tracks Monitored</div>
+                <div class="kpi-trend kpi-trend--neutral">Across 8 zones</div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ================================================================ -->
+    <!-- SENSOR TREND CHARTS                                              -->
+    <!-- ================================================================ -->
+    <section class="charts-section" id="charts-section">
+        <h2 class="section-title">
+            <span class="section-icon">📈</span>
+            Sensor Telemetry — 24 Hour Trend
+        </h2>
+        <div class="charts-grid">
+            <!-- Vibration Chart -->
+            <div class="chart-card" id="chart-vibration-card">
+                <div class="chart-header">
+                    <h3 class="chart-title">Vibration Amplitude</h3>
+                    <span class="chart-unit">mm/s</span>
+                </div>
+                <div class="chart-body">
+                    <canvas id="chart-vibration"></canvas>
+                </div>
+                <div class="chart-footer">
+                    <span class="chart-threshold chart-threshold--ok">Normal &lt; 3.5</span>
+                    <span class="chart-threshold chart-threshold--warn">Warning 3.5–5.0</span>
+                    <span class="chart-threshold chart-threshold--crit">Critical &gt; 5.0</span>
+                </div>
+            </div>
+
+            <!-- Temperature Chart -->
+            <div class="chart-card" id="chart-temperature-card">
+                <div class="chart-header">
+                    <h3 class="chart-title">Rail Temperature</h3>
+                    <span class="chart-unit">°C</span>
+                </div>
+                <div class="chart-body">
+                    <canvas id="chart-temperature"></canvas>
+                </div>
+                <div class="chart-footer">
+                    <span class="chart-threshold chart-threshold--ok">Normal &lt; 40</span>
+                    <span class="chart-threshold chart-threshold--warn">Warning 40–50</span>
+                    <span class="chart-threshold chart-threshold--crit">Critical &gt; 50</span>
+                </div>
+            </div>
+
+            <!-- Gauge Deviation Chart -->
+            <div class="chart-card" id="chart-gauge-card">
+                <div class="chart-header">
+                    <h3 class="chart-title">Gauge Deviation</h3>
+                    <span class="chart-unit">mm from 1676mm std</span>
+                </div>
+                <div class="chart-body">
+                    <canvas id="chart-gauge"></canvas>
+                </div>
+                <div class="chart-footer">
+                    <span class="chart-threshold chart-threshold--ok">Normal ±2</span>
+                    <span class="chart-threshold chart-threshold--warn">Warning ±4</span>
+                    <span class="chart-threshold chart-threshold--crit">Critical ±6</span>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ================================================================ -->
+    <!-- TRACK HEALTH TABLE + RECENT READINGS                             -->
+    <!-- ================================================================ -->
+    <section class="data-section" id="data-section">
+        <div class="data-grid">
+            <!-- Track Sections Health -->
+            <div class="data-card" id="track-health-card">
+                <h2 class="section-title">
+                    <span class="section-icon">🛤️</span>
+                    Track Section Health
+                </h2>
+                <div class="table-wrapper">
+                    <table class="data-table" id="track-table">
+                        <thead>
+                            <tr>
+                                <th>Track ID</th>
+                                <th>Section</th>
+                                <th>Zone</th>
+                                <th>Health</th>
+                                <th>Status</th>
+                                <th>Trains/Day</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for track in track_sections %}
+                            <tr>
+                                <td class="td-mono">{{ track.id }}</td>
+                                <td>{{ track.section }}</td>
+                                <td>{{ track.zone }}</td>
+                                <td>
+                                    <div class="health-bar-cell">
+                                        <div class="mini-health-bar">
+                                            <div class="mini-health-fill
+                                                {% if track.health >= 80 %}mini-health-fill--good
+                                                {% elif track.health >= 60 %}mini-health-fill--warn
+                                                {% else %}mini-health-fill--crit{% endif %}"
+                                                style="width: {{ track.health }}%"></div>
+                                        </div>
+                                        <span class="health-pct">{{ track.health }}%</span>
+                                    </div>
+                                </td>
+                                <td>
+                                    <span class="status-badge status-badge--{{ track.status }}">
+                                        {{ track.status|upper }}
+                                    </span>
+                                </td>
+                                <td class="td-mono">{{ track.trains_daily }}</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Recent Sensor Readings -->
+            <div class="data-card" id="recent-readings-card">
+                <h2 class="section-title">
+                    <span class="section-icon">📡</span>
+                    Recent Sensor Readings
+                </h2>
+                <div class="readings-list">
+                    {% for reading in recent_readings %}
+                    <div class="reading-item reading-item--{{ reading.status }}">
+                        <div class="reading-indicator"></div>
+                        <div class="reading-info">
+                            <div class="reading-track">{{ reading.track_id }}</div>
+                            <div class="reading-sensor">{{ reading.sensor }}</div>
+                        </div>
+                        <div class="reading-value">{{ reading.value }}</div>
+                        <div class="reading-time">{{ reading.time }}</div>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+    </section>
+</div>
+
+<!-- Inject sensor trend data as JSON for Chart.js -->
+{{ sensor_trends_json|json_script:"sensor-trends-data" }}
+{% endblock %}
+
+{% block extra_scripts %}
+<script>
+    // Initialize dashboard charts once the DOM is ready
+    document.addEventListener('DOMContentLoaded', function() {
+        const trendData = JSON.parse(
+            document.getElementById('sensor-trends-data').textContent
+        );
+        if (typeof initDashboardCharts === 'function') {
+            initDashboardCharts(trendData);
+        }
+    });
+</script>
+{% endblock %}

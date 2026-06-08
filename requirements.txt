@@ -1,0 +1,5 @@
+# requirements.txt
+# Rakshak Phase 1 — Dependencies
+# Only Django is required for the prototype dashboard.
+
+Django>=4.2,<5.0

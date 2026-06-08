@@ -1,0 +1,121 @@
+<!-- frontend/templates/base.html -->
+<!--
+  Base template for Rakshak — Railway Operations Control Center.
+  All pages extend this template to inherit the nav, header, and footer.
+  CDN links: Chart.js (dashboard charts), Leaflet.js (map), Google Fonts (Inter).
+-->
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Rakshak — AI-Powered Predictive Rail Maintenance System. Real-time railway infrastructure monitoring and predictive failure analysis.">
+    <title>{{ project_name }} — {{ page_title|default:"Control Center" }}</title>
+
+    <!-- Google Fonts — Inter for UI, JetBrains Mono for data readouts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+
+    <!-- Leaflet.js CSS (loaded on all pages for consistency, lightweight) -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+          integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY="
+          crossorigin="">
+
+    <!-- Rakshak stylesheet -->
+    <link rel="stylesheet" href="{% static 'css/dashboard.css' %}">
+
+    {% block extra_head %}{% endblock %}
+</head>
+<body>
+    <!-- ================================================================== -->
+    <!-- TOP HEADER BAR — Control Center branding + live clock              -->
+    <!-- ================================================================== -->
+    <header class="control-header" id="control-header">
+        <div class="header-left">
+            <div class="header-brand">
+                <span class="brand-icon">🛡️</span>
+                <div class="brand-text">
+                    <h1 class="brand-name">{{ project_name }}</h1>
+                    <span class="brand-subtitle">{{ project_subtitle }}</span>
+                </div>
+            </div>
+        </div>
+        <div class="header-center">
+            <div class="system-status">
+                <span class="status-dot status-dot--live"></span>
+                <span class="status-label">SYSTEM ONLINE</span>
+            </div>
+        </div>
+        <div class="header-right">
+            <div class="live-clock" id="live-clock">
+                <div class="clock-label">IST</div>
+                <div class="clock-time" id="clock-time">--:--:--</div>
+                <div class="clock-date" id="clock-date">----/--/--</div>
+            </div>
+            <div class="header-badge">
+                <span class="badge-text">{{ project_version }}</span>
+            </div>
+        </div>
+    </header>
+
+    <!-- ================================================================== -->
+    <!-- NAVIGATION BAR                                                     -->
+    <!-- ================================================================== -->
+    <nav class="control-nav" id="main-nav">
+        <div class="nav-inner">
+            {% for item in nav_items %}
+            <a href="{{ item.url }}"
+               class="nav-item {% if item.active %}nav-item--active{% endif %}"
+               id="nav-{{ item.icon }}">
+                <span class="nav-icon">
+                    {% if item.icon == 'dashboard' %}📊
+                    {% elif item.icon == 'alerts' %}🔔
+                    {% elif item.icon == 'tickets' %}🎫
+                    {% elif item.icon == 'map' %}🗺️
+                    {% endif %}
+                </span>
+                <span class="nav-label">{{ item.name }}</span>
+                <span class="nav-desc">{{ item.description }}</span>
+            </a>
+            {% endfor %}
+        </div>
+        <!-- Mobile hamburger toggle -->
+        <button class="nav-toggle" id="nav-toggle" aria-label="Toggle navigation">
+            <span></span><span></span><span></span>
+        </button>
+    </nav>
+
+    <!-- ================================================================== -->
+    <!-- MAIN CONTENT AREA                                                  -->
+    <!-- ================================================================== -->
+    <main class="control-main" id="main-content">
+        {% block content %}{% endblock %}
+    </main>
+
+    <!-- ================================================================== -->
+    <!-- FOOTER                                                             -->
+    <!-- ================================================================== -->
+    <footer class="control-footer">
+        <span>RAKSHAK v1.0 — Predictive Rail Maintenance</span>
+        <span>FAR AWAY 2026</span>
+    </footer>
+
+    <!-- ================================================================== -->
+    <!-- SCRIPTS                                                            -->
+    <!-- ================================================================== -->
+    <!-- Chart.js (loaded on all pages; only initialized where needed) -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.4/dist/chart.umd.min.js"></script>
+
+    <!-- Leaflet.js -->
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
+            integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo="
+            crossorigin=""></script>
+
+    <!-- Rakshak core JS (live clock, nav toggle, shared utilities) -->
+    <script src="{% static 'js/dashboard.js' %}"></script>
+
+    {% block extra_scripts %}{% endblock %}
+</body>
+</html>
