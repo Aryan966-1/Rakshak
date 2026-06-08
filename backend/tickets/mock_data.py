@@ -6,7 +6,9 @@ Simulates the maintenance workflow with Indian engineer names,
 realistic repair timelines, and Indian Railways terminology.
 """
 
-TICKETS = [
+from alerts.mock_data import ALERTS
+
+_TICKETS_BASE = [
     {
         'id': 'TKT-001',
         'linked_alert': 'ALT-2026-001',
@@ -14,8 +16,6 @@ TICKETS = [
         'status': 'assigned',
         'team': 'Eastern Maintenance Unit',
         'eta': '4 Hours',
-        'track_id': 'TRK-HWH-004',
-        'section': 'Howrah — Bandel Junction',
         'issue': 'Rail Fracture — Emergency Weld Repair',
     },
     {
@@ -25,8 +25,6 @@ TICKETS = [
         'status': 'scheduled',
         'team': 'Central Railway Team',
         'eta': '12 Hours',
-        'track_id': 'TRK-MUM-002',
-        'section': 'Mumbai CST — Thane',
         'issue': 'Rail Temperature Monitoring',
     },
     {
@@ -36,8 +34,6 @@ TICKETS = [
         'status': 'assigned',
         'team': 'Northern Maintenance Unit',
         'eta': '24 Hours',
-        'track_id': 'TRK-NDL-001',
-        'section': 'New Delhi — Ghaziabad',
         'issue': 'Track Geometry Correction',
     },
     {
@@ -47,8 +43,6 @@ TICKETS = [
         'status': 'scheduled',
         'team': 'Southern Track Gang',
         'eta': '48 Hours',
-        'track_id': 'TRK-MAS-003',
-        'section': 'Chennai Central — Tambaram',
         'issue': 'Scheduled Ultrasonic Flaw Detection',
     },
     {
@@ -58,11 +52,31 @@ TICKETS = [
         'status': 'assigned',
         'team': 'Western Emergency Unit',
         'eta': '2 Hours',
-        'track_id': 'TRK-ADI-009',
-        'section': 'Ahmedabad Junction — Surat',
         'issue': 'Signal Failure Investigation',
     }
 ]
+
+# Create an alert lookup dict for O(1) access
+alert_lookup = {a['id']: a for a in ALERTS}
+
+TICKETS = []
+for tb in _TICKETS_BASE:
+    linked_alert_id = tb.get('linked_alert')
+    alert_info = alert_lookup.get(linked_alert_id)
+    
+    # Enrich with alert data if found, overriding any mismatched values
+    if alert_info:
+        tb['track_id'] = alert_info['track_id']
+        tb['section'] = alert_info['section']
+        tb['station'] = alert_info['station']
+        tb['zone'] = alert_info['zone']
+    else:
+        tb['track_id'] = ''
+        tb['section'] = ''
+        tb['station'] = ''
+        tb['zone'] = ''
+
+    TICKETS.append(tb)
 
 # ---------------------------------------------------------------------------
 # Summary counts

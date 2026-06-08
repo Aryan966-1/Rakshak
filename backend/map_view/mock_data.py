@@ -86,3 +86,13 @@ RAIL_ROUTES = [
         'status': 'warning',
     },
 ]
+
+# ---------------------------------------------------------------------------
+# Summary counts
+# ---------------------------------------------------------------------------
+MAP_SUMMARY = {
+    'stations': len(STATIONS),
+    'track_sections': sum(s['tracks_monitored'] for s in STATIONS),
+    'active_routes': len(RAIL_ROUTES),
+    'railway_zones': len(set(s['zone'] for s in STATIONS)),
+}

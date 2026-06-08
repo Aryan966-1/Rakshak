@@ -39,19 +39,19 @@
     <!-- Map Stats Bar -->
     <section class="map-stats" id="map-stats">
         <div class="map-stat">
-            <div class="map-stat-value">12</div>
+            <div class="map-stat-value">{{ summary.stations }}</div>
             <div class="map-stat-label">Stations Monitored</div>
         </div>
         <div class="map-stat">
-            <div class="map-stat-value">156</div>
+            <div class="map-stat-value">{{ summary.track_sections }}</div>
             <div class="map-stat-label">Track Sections</div>
         </div>
         <div class="map-stat">
-            <div class="map-stat-value">4</div>
+            <div class="map-stat-value">{{ summary.active_routes }}</div>
             <div class="map-stat-label">Active Routes</div>
         </div>
         <div class="map-stat">
-            <div class="map-stat-value">8</div>
+            <div class="map-stat-value">{{ summary.railway_zones }}</div>
             <div class="map-stat-label">Railway Zones</div>
         </div>
     </section>

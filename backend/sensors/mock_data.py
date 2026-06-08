@@ -7,16 +7,10 @@ In future phases this will be replaced by live database queries
 and real-time sensor ingestion pipelines.
 """
 
-# ---------------------------------------------------------------------------
-# KPI Summary — displayed on the dashboard header cards
-# ---------------------------------------------------------------------------
-KPI_SUMMARY = {
-    'overall_health': 87.3,       # percentage
-    'active_alerts': 12,
-    'predicted_failures': 3,
-    'cost_savings': 24_50_000,    # ₹24.5 Lakhs saved via predictive maintenance
-    'tracks_monitored': 156,
-}
+from alerts.mock_data import ALERTS
+from map_view.mock_data import STATIONS
+
+
 
 # ---------------------------------------------------------------------------
 # Sensor trend data — 24-hour readings for Chart.js line charts
@@ -121,3 +115,19 @@ RECENT_READINGS = [
     {'track_id': 'TRK-NDL-001', 'sensor': 'Vibration', 'value': '2.1 mm/s', 'status': 'healthy', 'time': '14:01'},
     {'track_id': 'TRK-CHN-003', 'sensor': 'Temperature', 'value': '34°C', 'status': 'healthy', 'time': '13:55'},
 ]
+
+# ---------------------------------------------------------------------------
+# KPI Summary — displayed on the dashboard header cards
+# ---------------------------------------------------------------------------
+overall_health = sum(t['health'] for t in TRACK_SECTIONS) / len(TRACK_SECTIONS)
+active_alerts_count = len([a for a in ALERTS if a['status'] == 'active'])
+predicted_failures_count = len([a for a in ALERTS if a['severity'] == 'critical' and a['status'] == 'active'])
+tracks_monitored_count = sum(s['tracks_monitored'] for s in STATIONS)
+
+KPI_SUMMARY = {
+    'overall_health': round(overall_health, 1),
+    'active_alerts': active_alerts_count,
+    'predicted_failures': predicted_failures_count,
+    'cost_savings': 24_50_000,    # ₹24.5 Lakhs saved via predictive maintenance
+    'tracks_monitored': tracks_monitored_count,
+}

@@ -144,6 +144,31 @@ function createGradient(ctx, colorTop, colorBottom) {
     return gradient;
 }
 
+// Store chart instances globally to allow destruction
+window.rakshakChartInstances = window.rakshakChartInstances || {};
+
+function getChartColorConfig(type, values) {
+    if (!values || values.length === 0) return { main: '#10b981', bg: 'rgba(16,185,129,0.2)' };
+    const lastValue = values[values.length - 1];
+    let status = 'healthy'; // default
+    
+    if (type === 'vibration') {
+        if (lastValue > 5.0) status = 'critical';
+        else if (lastValue >= 3.5) status = 'warning';
+    } else if (type === 'temperature') {
+        if (lastValue > 50) status = 'critical';
+        else if (lastValue >= 40) status = 'warning';
+    } else if (type === 'gauge') {
+        const absVal = Math.abs(lastValue);
+        if (absVal > 6) status = 'critical';
+        else if (absVal >= 2) status = 'warning';
+    }
+
+    if (status === 'critical') return { main: '#ef4444', bg: 'rgba(239,68,68,0.2)' }; // Red
+    if (status === 'warning') return { main: '#f59e0b', bg: 'rgba(245,158,11,0.2)' }; // Amber
+    return { main: '#10b981', bg: 'rgba(16,185,129,0.2)' }; // Green
+}
+
 /**
  * Initialize all three dashboard sensor trend charts.
  * Called from dashboard.html after DOM load with parsed JSON data.
@@ -153,21 +178,27 @@ function initDashboardCharts(data) {
     // Only run on pages that have the chart canvases
     if (!document.getElementById('chart-vibration')) return;
 
+    // Prevent duplicate chart initialization
+    if (window.rakshakChartInstances.vibration) window.rakshakChartInstances.vibration.destroy();
+    if (window.rakshakChartInstances.temperature) window.rakshakChartInstances.temperature.destroy();
+    if (window.rakshakChartInstances.gauge) window.rakshakChartInstances.gauge.destroy();
+
     const timestamps = data.timestamps;
 
     // --- Vibration Chart ---
     const vibCtx = document.getElementById('chart-vibration').getContext('2d');
-    new Chart(vibCtx, {
+    const vibColors = getChartColorConfig('vibration', data.vibration);
+    window.rakshakChartInstances.vibration = new Chart(vibCtx, {
         type: 'line',
         data: {
             labels: timestamps,
             datasets: [{
                 label: 'Vibration (mm/s)',
                 data: data.vibration,
-                borderColor: '#f59e0b',
-                backgroundColor: createGradient(vibCtx, 'rgba(245,158,11,0.2)', 'rgba(245,158,11,0)'),
+                borderColor: vibColors.main,
+                backgroundColor: createGradient(vibCtx, vibColors.bg, 'rgba(0,0,0,0)'),
                 borderWidth: 2,
-                pointBackgroundColor: '#f59e0b',
+                pointBackgroundColor: vibColors.main,
                 pointBorderColor: '#111827',
                 pointBorderWidth: 2,
                 pointRadius: 3,
@@ -190,46 +221,23 @@ function initDashboardCharts(data) {
                     },
                 },
             },
-            plugins: {
-                ...getChartDefaults().plugins,
-                // Warning threshold annotation via plugin
-                annotation: {
-                    annotations: {
-                        warningLine: {
-                            type: 'line',
-                            yMin: 3.5,
-                            yMax: 3.5,
-                            borderColor: 'rgba(245, 158, 11, 0.4)',
-                            borderWidth: 1,
-                            borderDash: [5, 5],
-                        },
-                        criticalLine: {
-                            type: 'line',
-                            yMin: 5.0,
-                            yMax: 5.0,
-                            borderColor: 'rgba(239, 68, 68, 0.4)',
-                            borderWidth: 1,
-                            borderDash: [5, 5],
-                        },
-                    },
-                },
-            },
         },
     });
 
     // --- Temperature Chart ---
     const tempCtx = document.getElementById('chart-temperature').getContext('2d');
-    new Chart(tempCtx, {
+    const tempColors = getChartColorConfig('temperature', data.temperature);
+    window.rakshakChartInstances.temperature = new Chart(tempCtx, {
         type: 'line',
         data: {
             labels: timestamps,
             datasets: [{
                 label: 'Temperature (°C)',
                 data: data.temperature,
-                borderColor: '#ef4444',
-                backgroundColor: createGradient(tempCtx, 'rgba(239,68,68,0.2)', 'rgba(239,68,68,0)'),
+                borderColor: tempColors.main,
+                backgroundColor: createGradient(tempCtx, tempColors.bg, 'rgba(0,0,0,0)'),
                 borderWidth: 2,
-                pointBackgroundColor: '#ef4444',
+                pointBackgroundColor: tempColors.main,
                 pointBorderColor: '#111827',
                 pointBorderWidth: 2,
                 pointRadius: 3,
@@ -257,17 +265,18 @@ function initDashboardCharts(data) {
 
     // --- Gauge Deviation Chart ---
     const gaugeCtx = document.getElementById('chart-gauge').getContext('2d');
-    new Chart(gaugeCtx, {
+    const gaugeColors = getChartColorConfig('gauge', data.gauge_deviation);
+    window.rakshakChartInstances.gauge = new Chart(gaugeCtx, {
         type: 'line',
         data: {
             labels: timestamps,
             datasets: [{
                 label: 'Gauge Deviation (mm)',
                 data: data.gauge_deviation,
-                borderColor: '#3b82f6',
-                backgroundColor: createGradient(gaugeCtx, 'rgba(59,130,246,0.2)', 'rgba(59,130,246,0)'),
+                borderColor: gaugeColors.main,
+                backgroundColor: createGradient(gaugeCtx, gaugeColors.bg, 'rgba(0,0,0,0)'),
                 borderWidth: 2,
-                pointBackgroundColor: '#3b82f6',
+                pointBackgroundColor: gaugeColors.main,
                 pointBorderColor: '#111827',
                 pointBorderWidth: 2,
                 pointRadius: 3,

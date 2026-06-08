@@ -24,6 +24,6 @@ def dashboard(request):
         'track_sections': TRACK_SECTIONS,
         'recent_readings': RECENT_READINGS,
         # Serialize trend data for Chart.js (consumed via json_script in template)
-        'sensor_trends_json': json.dumps(SENSOR_TRENDS),
+        'sensor_trends_json': SENSOR_TRENDS,
     }
     return render(request, 'dashboard.html', context)
