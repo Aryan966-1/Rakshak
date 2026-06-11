@@ -1,21 +1,18 @@
+# backend/map_view/views.py
+"""
+Map page view — renders the railway map template.
+
+All map data is now fetched from API endpoints (/api/stations/,
+/api/routes/, etc.) by the frontend JavaScript. This view only
+renders the HTML template shell.
+"""
+
 from django.shortcuts import render
 
-from .mock_data import STATIONS, RAIL_ROUTES, MAP_SUMMARY
 
 def map_page(request):
     """Render the railway map page."""
     context = {
         "page_title": "Railway Map",
-
-        # Pass raw Python objects
-        # json_script in the template will serialize safely.
-        "stations": STATIONS,
-        "routes": RAIL_ROUTES,
-        "summary": MAP_SUMMARY,
     }
-
-    return render(
-        request,
-        "map.html",
-        context,
-    )
+    return render(request, "map.html", context)

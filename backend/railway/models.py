@@ -299,6 +299,15 @@ class TrackSection(TimeStampedModel):
         blank=True,
         help_text="Used by maintenance scheduling queries.",
     )
+    geometry = models.JSONField(
+        default=list,
+        blank=True,
+        help_text=(
+            "Leaflet-compatible polyline coordinates as [[lat, lng], ...]. "
+            "Used by the map API to render route lines without a separate "
+            "GeoJSON file."
+        ),
+    )
 
     class Meta:
         db_table = "rakshak_track_section"
