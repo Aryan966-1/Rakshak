@@ -1,30 +1,53 @@
 # backend/alerts/views.py
-"""
-Alerts view — displays all infrastructure alerts.
-
-Renders the alerts page with severity-coded alert cards,
-filtering controls, and alert history.
-"""
-
 from django.shortcuts import render
-
-from .mock_data import ALERTS, ALERT_SUMMARY
+from railway.models import Alert
 
 
 def alerts_page(request):
-    """Render the alerts listing page."""
-    # Optional severity filter from query string (e.g., ?severity=critical)
+    """Display alerts with optional severity filtering and summary statistics."""
     severity_filter = request.GET.get('severity', 'all')
 
+    all_alerts = Alert.objects.select_related(
+        'track_section__start_station__division__zone',
+        'track_section__end_station',
+    )
+
+    # Build summary from the full (unfiltered) queryset
+    summary = {
+        'total': all_alerts.count(),
+        'critical': all_alerts.filter(severity='critical').count(),
+        'warning': all_alerts.filter(severity='warning').count(),
+        'info': all_alerts.filter(severity='info').count(),
+        'active': all_alerts.filter(status='active').count(),
+        'resolved': all_alerts.filter(status='resolved').count(),
+    }
+
+    # Apply severity filter
     if severity_filter != 'all':
-        filtered_alerts = [a for a in ALERTS if a['severity'] == severity_filter]
+        filtered_qs = all_alerts.filter(severity=severity_filter)
     else:
-        filtered_alerts = ALERTS
+        filtered_qs = all_alerts
+
+    # Serialize each alert to the dict shape expected by the template
+    alerts = []
+    for alert in filtered_qs:
+        alerts.append({
+            'id': alert.alert_code,
+            'severity': alert.severity,
+            'title': alert.title,
+            'description': alert.description,
+            'track_id': alert.track_section.section_code,
+            'section': f"{alert.track_section.start_station.station_name} — {alert.track_section.end_station.station_name}",
+            'station': alert.track_section.start_station.station_name,
+            'zone': alert.track_section.start_station.division.zone.name,
+            'timestamp': alert.generated_at.strftime('%Y-%m-%d %H:%M:%S'),
+            'status': alert.status,
+        })
 
     context = {
         'page_title': 'Alerts',
-        'alerts': filtered_alerts,
-        'summary': ALERT_SUMMARY,
+        'alerts': alerts,
+        'summary': summary,
         'current_filter': severity_filter,
     }
     return render(request, 'alerts.html', context)
