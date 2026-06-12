@@ -73,8 +73,8 @@ function initRailwayMapFromAPI() {
         zoomControl: true,
     });
 
-    // Dark tile layer — CartoDB Dark Matter for the operations center look
-    L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
+    // Light tile layer — CartoDB Positron for a clean, light-themed map
+    L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', {
         attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OSM</a> &copy; <a href="https://carto.com/">CARTO</a>',
         subdomains: 'abcd',
         maxZoom: 20,
@@ -289,7 +289,7 @@ function _renderAlerts(map, alerts) {
         // Alert marker (diamond-shaped via DivIcon)
         var marker = L.circleMarker([alert.lat, alert.lng], {
             radius: 6,
-            color: '#111827',
+            color: '#ffffff',
             fillColor: color,
             fillOpacity: 1.0,
             weight: 2,
@@ -319,52 +319,55 @@ function _injectMapStyles() {
     var style = document.createElement('style');
     style.textContent =
         '.station-label {' +
-        '  background: rgba(17, 24, 39, 0.9) !important;' +
-        '  color: #f1f5f9 !important;' +
-        '  border: 1px solid rgba(255,255,255,0.1) !important;' +
+        '  background: rgba(255, 255, 255, 0.95) !important;' +
+        '  color: #000000 !important;' +
+        '  border: 1px solid rgba(0,0,0,0.12) !important;' +
         '  font-family: "JetBrains Mono", monospace !important;' +
         '  font-size: 10px !important;' +
         '  font-weight: 600 !important;' +
         '  letter-spacing: 1px !important;' +
         '  padding: 2px 6px !important;' +
         '  border-radius: 4px !important;' +
-        '  box-shadow: 0 2px 8px rgba(0,0,0,0.3) !important;' +
+        '  box-shadow: 0 2px 8px rgba(0,0,0,0.1) !important;' +
         '}' +
-        '.station-label::before { border-top-color: rgba(17,24,39,0.9) !important; }' +
+        '.station-label::before { border-top-color: rgba(255,255,255,0.95) !important; }' +
         '.dark-popup .leaflet-popup-content-wrapper {' +
-        '  background: #111827 !important;' +
-        '  border: 1px solid rgba(255,255,255,0.06) !important;' +
+        '  background: #ffffff !important;' +
+        '  color: #000000 !important;' +
+        '  border: 1px solid rgba(0,0,0,0.1) !important;' +
+        '  box-shadow: 0 4px 16px rgba(0,0,0,0.12) !important;' +
         '}' +
         '.dark-popup .leaflet-popup-tip {' +
-        '  background: #111827 !important;' +
+        '  background: #ffffff !important;' +
         '}' +
         '.station-popup h4 {' +
         '  margin: 0 0 8px 0;' +
-        '  color: #f1f5f9;' +
+        '  color: #000000;' +
         '  font-size: 0.95rem;' +
         '  font-weight: 600;' +
         '}' +
         '.popup-code {' +
         '  font-family: "JetBrains Mono", monospace;' +
         '  font-size: 0.75rem;' +
-        '  color: #64748b;' +
+        '  color: #666666;' +
         '  margin-bottom: 8px;' +
         '}' +
         '.popup-detail {' +
         '  display: flex;' +
         '  justify-content: space-between;' +
         '  padding: 3px 0;' +
-        '  border-bottom: 1px solid rgba(255,255,255,0.04);' +
+        '  border-bottom: 1px solid rgba(0,0,0,0.06);' +
         '}' +
         '.popup-label {' +
-        '  color: #94a3b8;' +
+        '  color: #888888;' +
         '  font-size: 0.8rem;' +
         '}' +
         '.popup-value {' +
-        '  color: #f1f5f9;' +
+        '  color: #000000;' +
         '  font-family: "JetBrains Mono", monospace;' +
         '  font-size: 0.8rem;' +
         '  font-weight: 500;' +
         '}';
     document.head.appendChild(style);
 }
+

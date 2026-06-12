@@ -82,8 +82,9 @@ function animateCounters() {
 // CHART.JS INITIALIZATION — Sensor trend charts on the dashboard
 // ====================================================================
 
-// Shared Chart.js defaults for dark theme
+// Shared Chart.js defaults — theme-aware
 function getChartDefaults() {
+    const dark = isDarkMode();
     return {
         responsive: true,
         maintainAspectRatio: false,
@@ -94,10 +95,10 @@ function getChartDefaults() {
         plugins: {
             legend: { display: false },
             tooltip: {
-                backgroundColor: '#111827',
-                titleColor: '#f1f5f9',
-                bodyColor: '#94a3b8',
-                borderColor: 'rgba(255,255,255,0.06)',
+                backgroundColor: dark ? '#111111' : '#f0f0f0',
+                titleColor: dark ? '#ffffff' : '#000000',
+                bodyColor: dark ? '#a0a0a0' : '#555555',
+                borderColor: dark ? 'rgba(255,255,255,0.08)' : 'rgba(0,0,0,0.08)',
                 borderWidth: 1,
                 padding: 12,
                 cornerRadius: 8,
@@ -108,21 +109,21 @@ function getChartDefaults() {
         scales: {
             x: {
                 grid: {
-                    color: 'rgba(255,255,255,0.04)',
+                    color: dark ? 'rgba(255,255,255,0.04)' : 'rgba(0,0,0,0.06)',
                     drawBorder: false,
                 },
                 ticks: {
-                    color: '#64748b',
+                    color: dark ? '#666666' : '#888888',
                     font: { family: 'JetBrains Mono', size: 10 },
                 },
             },
             y: {
                 grid: {
-                    color: 'rgba(255,255,255,0.04)',
+                    color: dark ? 'rgba(255,255,255,0.04)' : 'rgba(0,0,0,0.06)',
                     drawBorder: false,
                 },
                 ticks: {
-                    color: '#64748b',
+                    color: dark ? '#666666' : '#888888',
                     font: { family: 'JetBrains Mono', size: 10 },
                 },
             },
@@ -178,12 +179,16 @@ function initDashboardCharts(data) {
     // Only run on pages that have the chart canvases
     if (!document.getElementById('chart-vibration')) return;
 
+    // Store data for re-rendering on theme change
+    window.rakshakLastChartData = data;
+
     // Prevent duplicate chart initialization
     if (window.rakshakChartInstances.vibration) window.rakshakChartInstances.vibration.destroy();
     if (window.rakshakChartInstances.temperature) window.rakshakChartInstances.temperature.destroy();
     if (window.rakshakChartInstances.gauge) window.rakshakChartInstances.gauge.destroy();
 
     const timestamps = data.timestamps;
+    const pointBorder = isDarkMode() ? '#111111' : '#f0f0f0';
 
     // --- Vibration Chart ---
     const vibCtx = document.getElementById('chart-vibration').getContext('2d');
@@ -199,7 +204,7 @@ function initDashboardCharts(data) {
                 backgroundColor: createGradient(vibCtx, vibColors.bg, 'rgba(0,0,0,0)'),
                 borderWidth: 2,
                 pointBackgroundColor: vibColors.main,
-                pointBorderColor: '#111827',
+                pointBorderColor: pointBorder,
                 pointBorderWidth: 2,
                 pointRadius: 3,
                 pointHoverRadius: 6,
@@ -238,7 +243,7 @@ function initDashboardCharts(data) {
                 backgroundColor: createGradient(tempCtx, tempColors.bg, 'rgba(0,0,0,0)'),
                 borderWidth: 2,
                 pointBackgroundColor: tempColors.main,
-                pointBorderColor: '#111827',
+                pointBorderColor: pointBorder,
                 pointBorderWidth: 2,
                 pointRadius: 3,
                 pointHoverRadius: 6,
@@ -277,7 +282,7 @@ function initDashboardCharts(data) {
                 backgroundColor: createGradient(gaugeCtx, gaugeColors.bg, 'rgba(0,0,0,0)'),
                 borderWidth: 2,
                 pointBackgroundColor: gaugeColors.main,
-                pointBorderColor: '#111827',
+                pointBorderColor: pointBorder,
                 pointBorderWidth: 2,
                 pointRadius: 3,
                 pointHoverRadius: 6,
@@ -304,6 +309,45 @@ function initDashboardCharts(data) {
 }
 
 // ====================================================================
+// THEME TOGGLE — Dark/Light mode with localStorage persistence
+// ====================================================================
+function initThemeToggle() {
+    const toggle = document.getElementById('theme-toggle');
+    const root = document.documentElement;
+
+    // Determine initial theme: localStorage > system preference > dark (default)
+    const stored = localStorage.getItem('rakshak-theme');
+    if (stored) {
+        root.setAttribute('data-theme', stored);
+    } else {
+        // Check system preference
+        const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+        root.setAttribute('data-theme', prefersDark ? 'dark' : 'light');
+    }
+
+    if (!toggle) return;
+
+    toggle.addEventListener('click', function () {
+        const current = root.getAttribute('data-theme') || 'dark';
+        const next = current === 'dark' ? 'light' : 'dark';
+        root.setAttribute('data-theme', next);
+        localStorage.setItem('rakshak-theme', next);
+
+        // Re-render charts if they exist (to update colors)
+        if (window.rakshakLastChartData) {
+            initDashboardCharts(window.rakshakLastChartData);
+        }
+    });
+
+    // Listen for system preference changes
+    window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', function (e) {
+        if (!localStorage.getItem('rakshak-theme')) {
+            root.setAttribute('data-theme', e.matches ? 'dark' : 'light');
+        }
+    });
+}
+
+// ====================================================================
 // NAVIGATION TOGGLE (mobile)
 // ====================================================================
 function initNavToggle() {
@@ -319,9 +363,17 @@ function initNavToggle() {
 }
 
 // ====================================================================
+// THEME-AWARE HELPERS
+// ====================================================================
+function isDarkMode() {
+    return document.documentElement.getAttribute('data-theme') !== 'light';
+}
+
+// ====================================================================
 // INITIALIZE ON DOM READY
 // ====================================================================
 document.addEventListener('DOMContentLoaded', function () {
+    initThemeToggle();
     initLiveClock();
     animateCounters();
     initNavToggle();
